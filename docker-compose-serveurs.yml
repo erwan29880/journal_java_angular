@@ -1,0 +1,27 @@
+version: '3.6'
+
+services:
+  journalback:
+    build:
+      context: ./backprod
+      dockerfile: Dockerfile
+    container_name: journal_back
+    restart: always
+    ports:
+      - 8999:8080
+    networks:
+      - journal
+
+  journalfront:
+    build: 
+      context: ./frontprod 
+      dockerfile: Dockerfile
+    container_name: journal_front 
+    ports:
+    - 9000:7857
+    depends_on:
+      - journalback
+
+networks:
+  journal:
+    external: true

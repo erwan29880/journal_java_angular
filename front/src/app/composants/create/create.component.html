@@ -1,0 +1,23 @@
+<div class="container">
+
+    <div *ngIf="message">
+        <p class="message">{{message}}</p>
+    </div>
+
+    <div class="formulaire">
+        
+        <form [formGroup]="note" (ngSubmit)="onSubmit()">
+
+            <div class="input">
+                <textarea cols="64" rows = "10" formControlName="note" id="note"></textarea>
+            </div>
+
+            <div>
+                <button type="submit">valider</button>
+            </div>
+
+
+        </form>
+    </div>
+
+</div>

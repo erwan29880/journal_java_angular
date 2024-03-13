@@ -1,0 +1,24 @@
+<div class="container">
+    <div *ngIf="donnes$ | async as don">
+        <div *ngFor="let d of don">
+            <div class="item" (click)="chargeItem($event, d.id)">
+                <div class="date">{{ d.quand | date:"dd MMMM yyyy" }}</div>
+                <div class="note">{{ d.note }}</div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="piednumeropage" *ngIf="numerosPages.length > 0">
+
+        <div class="flexipages">
+            <div *ngFor="let i of numerosPages">
+                <div (click)="changePage($event, i)" class="numeropageactivated" *ngIf="i == page+1">{{i}}</div>
+                <div (click)="changePage($event, i)" class="numeropage" *ngIf="i != page+1 && i !=0">{{i}}</div>
+                <div class="numeropage" *ngIf="i == 0">...</div>
+            </div>
+        </div>
+    </div>
+
+
+</div>

@@ -1,0 +1,10 @@
+<h1>Journal</h1>
+
+    <div class="flexi" id="nav">
+      <div (click)="goToIndex()"><button class="menu">Login</button></div>
+      <div (click)="goToAll()"><button class="menu">All</button></div>
+      <div (click)="goToForm()"><button class="menu">Create</button></div>
+      <div (click)="logout()"><button class="menu">Logout</button></div>
+    </div>
+
+    <router-outlet></router-outlet>

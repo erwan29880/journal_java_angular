@@ -1,0 +1,7 @@
+frontprod/
+mysqld/
+backprod/
+front/dist/
+.vscode
+.angular
+*.editorconfig

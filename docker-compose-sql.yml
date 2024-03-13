@@ -1,0 +1,20 @@
+version: '3.6'
+
+services:
+  database:
+    container_name: "journaldb"
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    environment:
+      - MYSQL_ROOT_PASSWORD=pa
+    ports:
+      - 3306:3306
+    networks:
+      - journal
+    volumes:
+      - ./mysqld:/var/lib/mysqld
+
+networks:
+  journal:
+    external: true

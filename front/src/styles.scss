@@ -1,0 +1,116 @@
+body{
+    width: 80%;
+    margin: auto;
+    --col : rgb(64, 87, 115);
+    --col2 : rgb(41, 61, 86);
+}
+
+h1{
+    width: 100%;
+    text-align: center;
+}
+
+.flexi {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+button {
+    background-color: var(--col);
+    border-radius: 7px;
+    color: white;
+    transition-duration: 0.4s;
+}
+button:hover {
+    background-color:var(--col2);
+}
+
+.menu {
+    width: 150px;
+    margin: 0px 10px;
+}
+
+.container {
+    padding: 10px 0px;
+}
+
+.item {
+    border: 1px solid lightgray;
+    padding: 10px;
+    margin: 10px 10x 25px 10px;
+    margin-top: 5px;
+    border-radius: 7px;
+    box-shadow: -2px 5px 5px lightgray;
+}
+
+.message{
+    margin: auto;
+    margin-top: 20px;;
+    font-weight: bold;
+    color: blue;
+    margin-bottom: 20px;
+}
+
+.date {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.note {
+    white-space: pre-wrap;
+}
+
+textarea {
+    width: 100%;
+    height: 150px;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    font-size: 16px;
+    resize: none;
+}
+
+.place-center{
+    width: 60%;
+    margin: auto;
+    div{
+        margin-bottom: 20px;
+    }
+    .input{
+        border: 1px solid lightgray;
+        width: 100%;
+    }
+    input{
+        border: none;
+        width: 100%;
+    }
+}
+
+// numéros de pages
+
+.piednumeropage {
+    margin-top: 15px;
+}
+
+.flexipages {
+    display: flex;
+    flex-direction: row;
+}
+
+.numeropage {
+    border: 1px solid lightgray;
+    width: 15px;
+    padding : 5px;
+    margin: 0px 3px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.numeropageactivated {
+    @extend .numeropage;
+    background-color: grey;
+}
+
