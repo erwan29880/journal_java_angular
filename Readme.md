@@ -1,3 +1,3 @@
 # projet en cours
 
-## desfription à venir
+## description à venir

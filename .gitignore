@@ -5,3 +5,5 @@ front/dist/
 .vscode
 .angular
 *.editorconfig
+*.bak
+journalsauv.sql

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+passwordinit="sqlpassword"
 NODEMODULES="$PWD/front/node_modules"
 EXTENSION="old"
 PAT="$PWD"
@@ -37,6 +38,9 @@ for t in ${arr_sauv[@]}
                 rm "$t"
         fi
 done
+
+docker exec journaldb bash -c "mysqldump -u root -p$passwordinit application journal > journal.sql"
+docker cp journaldb:journal.sql "$PAT"/journalsauv.sql
 
 # suppression du container de la base de données
 docker-compose -f "$COMPOSE" down
