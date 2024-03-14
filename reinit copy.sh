@@ -41,11 +41,10 @@ for t in ${arr_sauv[@]}
         fi
 done
 
-# ne pas créer de variable pour journalsauv.sql, ce pattern est utilisé par sed dans install.sh
-# il faut une seule occurence de journalsauv.sql dans le fichier
+
 docker exec journaldb bash -c "mysqldump -u root -p$passwordinit application journal > journal.sql"
 docker cp journaldb:journal.sql "$PAT"/journalsauv.sql
 
 # suppression du container de la base de données
-docker-compose -f "$COMPOSE_SERVEURS" down
 docker-compose -f "$COMPOSE" down
+docker-compose -f "$COMPOSE_SERVEURS" down

@@ -2,6 +2,8 @@
 
 # todo : donner la possibilité de changer les ports
 # todo : entrée utilisateur
+# todo : build angular dans le container
+
 
 # utilitaires
 EXTENSION="old"
@@ -64,6 +66,9 @@ compose_password_line_dev="$COMPOSE_PASSWORD_LINE$pwd_sql_dev"
 compose_password_line_prod="$COMPOSE_PASSWORD_LINE$pwd_sql_prod"
 host_prod="$host_du_front_end:$port_prod"
 host_prod_back="http:\/\/localhost:$port_back"
+dockerfile_sql="$PAT/database/Dockerfile"
+dockerfile_sql_sauv="$dockerfile_sql$EXTENSION"
+
 
 arr=("$PROPERTIES" "$CONTROLLEUR" "$UPAF" "$COMPOSE" "$SERVICE" "$COMPOSE_SERVEURS")
 arr_sauv=("$PROPERTIES_SAUV" "$CONTROLLEUR_SAUV" "$UPAF_SAUV" "$COMPOSE_SAUV" "$SERVICE_SAUV" "$COMPOSE_SERVEURS_SAUV")
@@ -124,9 +129,15 @@ sed -i '/journalsauv/i\docker exec journaldb bash -c "mysqldump -u root -p$passw
 sed -i.bak '/modules/i\passwordinit="'$pwd_sql_prod_entry'"' reinit.sh
 
 # changer le fichier de configuration sql si il y a une restauration de table journal à effectuer 
+cp "$dockerfile_sql" "$dockerfile_sql_sauv"
 if [ -f "$database_sauv" ]
     then 
+        cp "$PAT"/journalsauv.sql "$PAT"/database/sql_restaure.sql
+        sed -i '/DROP/i\USE application;' "$PAT"/database/sql_restaure.sql
+        sed -i '/USE application/i\CREATE DATABASE IF NOT EXISTS application;' "$PAT"/database/sql_restaure.sql
         sed -i 's/sql.sql/sql_restaure.sql/' "$PAT/database/Dockerfile"
+    else 
+        echo "pas de fichier de sauvegarde sql, création de la table"
 fi
 
 echo " "
@@ -199,8 +210,8 @@ docker-compose -f "$COMPOSE" up -d --build
 
 
 echo " "
-echo "-----------------------"
-echo "----build de spring----"
+echo "-----------------------------------------------------"
+echo "----build de spring----------------------------------"
 echo " "
 
 if [ -f "$JAR_BUILT" ]
@@ -208,9 +219,9 @@ if [ -f "$JAR_BUILT" ]
         rm "JAR_BUILT"
 fi
 
-cd back && mvn install -DskipTests
-cd ..
-mv "$JAR_BUILT" backprod
+# cd back && mvn install -DskipTests
+# cd ..
+# mv "$JAR_BUILT" backprod
 
 
 echo " "
@@ -229,13 +240,15 @@ do
     ProgressBar ${number} ${_end}
 done
 
-if [ -f "$database_sauv" ]
-    then 
-        echo " "
-        docker ps | grep journaldb
-        docker cp "$database_sauv" journaldb:journal.sql
-        docker exec journaldb bash -c "mysql -u root -p$pwd_sql_prod_entry application < journal.sql"
-fi
+echo " "
+
+# if [ -f "$database_sauv" ]
+#     then 
+#         echo " "
+#         docker ps | grep journaldb
+#         docker cp "$database_sauv" journaldb:journal.sql
+        # docker exec journaldb bash -c "mysql -u root -p$pwd_sql_prod_entry application < journal.sql"
+# fi
 
 # echo "Verifier que l'application web fonctionne, aller sur :"
 # echo "$host_prod"

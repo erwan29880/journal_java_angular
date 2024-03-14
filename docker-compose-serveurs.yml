@@ -3,7 +3,7 @@ version: '3.6'
 services:
   journalback:
     build:
-      context: ./backprod
+      context: ./back
       dockerfile: Dockerfile
     container_name: journal_back
     restart: always
