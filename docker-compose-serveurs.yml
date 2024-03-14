@@ -14,8 +14,8 @@ services:
 
   journalfront:
     build: 
-      context: ./frontprod 
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile_node
     container_name: journal_front 
     ports:
     - 9000:7857

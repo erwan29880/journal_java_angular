@@ -41,7 +41,9 @@ for t in ${arr_sauv[@]}
         fi
 done
 
+docker exec journaldb bash -c "mysqldump -u root -p$passwordinit application journal > journal.sql"
 # ne pas créer de variable pour journalsauv.sql, ce pattern est utilisé par sed dans install.sh
+docker exec journaldb bash -c "mysqldump -u root -p$passwordinit application journal > journal.sql"
 # il faut une seule occurence de journalsauv.sql dans le fichier
 docker exec journaldb bash -c "mysqldump -u root -p$passwordinit application journal > journal.sql"
 docker cp journaldb:journal.sql "$PAT"/journalsauv.sql

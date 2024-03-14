@@ -7,4 +7,4 @@ front/dist/
 *.editorconfig
 *.bak
 journalsauv.sql
-database/sql_restaure.sql
+**/sql_restaure.sql

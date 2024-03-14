@@ -27,10 +27,10 @@ host_du_front_end="http:\/\/localhost"
 # paths---------------------------------------------------
 
 # front
-NODEMODULES="$PWD/front/node_modules"
-ANGULAR_BUILT="$PWD/front/dist"
-NODE_BUILD_DEV="$ANGULAR_BUILT/journal"
-NODE_BUILD_PROD="$PWD/frontprod/build"
+# NODEMODULES="$PWD/front/node_modules"
+# ANGULAR_BUILT="$PWD/front/dist"
+# NODE_BUILD_DEV="$ANGULAR_BUILT/journal"
+# NODE_BUILD_PROD="$PWD/frontprod/build"
 REQUEST_URL="http:/\/\localhost:8080"
 SERVICE="$PAT/front/src/app/services/service.service.ts"
 SERVICE_SAUV="$PAT/front/src/app/services/service.service.ts$EXTENSION"
@@ -140,56 +140,6 @@ if [ -f "$database_sauv" ]
         echo "pas de fichier de sauvegarde sql, création de la table"
 fi
 
-echo " "
-echo "---------------------------------------------------------"
-echo "----installation des paquets requis pour le front-end----"
-echo " "
-
-# vérification qu'angular est installé
-angular_global=$(npm list --global | grep @angular\/cli)
-if [ "${#angular_global[0]}" -gt 0 ]
-    then 
-        echo "angular cli déjà installée globalement"
-    else 
-        echo "installation de angular cli globalement"
-        npm install -g @angular/cli
-fi
-
-# installation des paquets requis
-if [ ! -d "$NODEMODULES" ]
-    then
-        echo "Installation des packages node";
-        cd front && npm install && cd ..
-        echo "angular done\n" 
-    else 
-        echo "le dossier node_modules existe, skipping"
-fi
-
-
-if [  -d "$NODE_BUILD_DEV" ]
-    then 
-        echo "suppression de $NODE_BUILD_DEV"
-        rm -r "$ANGULAR_BUILT"
-        echo "done"
-fi 
-
-if [  -d "$NODE_BUILD_PROD" ]
-    then 
-        echo "suppression de $NODE_BUILD_PROD"
-        rm -r "$NODE_BUILD_PROD"
-        echo "done"
-fi 
-
-
-echo " "
-echo "-----------------------"
-echo "----build d'angular----"
-echo " "
-
-cd front && ng build && cd ..
-cp -r "$NODE_BUILD_DEV" "$NODE_BUILD_PROD"
-rm -r "$ANGULAR_BUILT"
-
 
 echo " "
 echo "------------------------------------------"
@@ -210,21 +160,6 @@ docker-compose -f "$COMPOSE" up -d --build
 
 
 echo " "
-echo "-----------------------------------------------------"
-echo "----build de spring----------------------------------"
-echo " "
-
-if [ -f "$JAR_BUILT" ]
-    then 
-        rm "JAR_BUILT"
-fi
-
-# cd back && mvn install -DskipTests
-# cd ..
-# mv "$JAR_BUILT" backprod
-
-
-echo " "
 echo "--------------------------------------"
 echo "----build des serveurs avec docker----"
 echo " "
@@ -242,13 +177,6 @@ done
 
 echo " "
 
-# if [ -f "$database_sauv" ]
-#     then 
-#         echo " "
-#         docker ps | grep journaldb
-#         docker cp "$database_sauv" journaldb:journal.sql
-        # docker exec journaldb bash -c "mysql -u root -p$pwd_sql_prod_entry application < journal.sql"
-# fi
 
 # echo "Verifier que l'application web fonctionne, aller sur :"
 # echo "$host_prod"
