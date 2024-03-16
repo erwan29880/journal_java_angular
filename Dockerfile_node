@@ -2,8 +2,10 @@ FROM node:18-alpine as builder
 
 WORKDIR /usr/src/app
 COPY front/package.json ./
-RUN npm install && npm install -g @angular/cli
-COPY front/. .
+COPY front/*.json ./
+COPY front/src ./src/
+COPY front/.angular ./.angular/
+RUN npm --silent install && npm install -g @angular/cli
 RUN ng build
 
 FROM node:18-alpine

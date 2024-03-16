@@ -10,7 +10,7 @@
     <div *ngIf="check==false">
         <div *ngIf="data">
             
-            <div class="date">{{ data.quand | date:"dd MMMM yyyy" }} - {{data.id}}</div>
+            <div class="date">{{ data.quand | date:"dd MMMM yyyy" }}</div>
     
             <form [formGroup]="infos" (ngSubmit)="onSubmit()">
                 <div>
@@ -20,7 +20,7 @@
                 </div>
         
                 <div>
-                    <button type="submit">valider</button>
+                    <button type="submit">mettre à jour</button>
                 </div>
         
             </form>

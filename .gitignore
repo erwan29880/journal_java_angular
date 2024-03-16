@@ -8,3 +8,6 @@ front/dist/
 *.bak
 journalsauv.sql
 **/sql_restaure.sql
+db_backup.sql
+restaure_bdd.sh
+sauvegarde_bdd.sh

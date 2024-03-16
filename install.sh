@@ -1,25 +1,57 @@
 #!/bin/bash
 
-# todo : donner la possibilité de changer les ports
-# todo : entrée utilisateur
-# todo : build angular dans le container
-
+if [ -f docker-compose-serveurs.ymlold ]
+    then 
+        echo "Utiliser la reinit.sh avant de réinstaller ! "
+        exit 1
+fi
 
 # utilitaires
 EXTENSION="old"
+egal="="
 PAT="$PWD"
 COMPOSE_PASSWORD_LINE="MYSQL_ROOT_PASSWORD"
-egal="="
 port_back="8999"
-port_prod="5678"
 
 ##############################################################################################
 ##############################################################################################
 ####  renseigner ici vos identifiants souhaités  #############################################
-login_prod="monlogindeprod"
-pwd_prod="monpwddeprod"
-pwd_sql_prod_entry="sqlpassword"
-host_du_front_end="http:\/\/localhost" 
+echo "Rentrez le mot de passe souhaité pour la base de données (pas de caractères spéciaux ni d'espaces) :"
+read pwd_sql_prod_entry
+echo "Rentrez le login souhaité pour Spring Security :"
+read login_prod
+echo "Rentrez le mot de passe souhaité pour Spring Security (pas de caractères spéciaux ni d'espaces) :"
+read pwd_prod
+echo "Rentrez l'url souhaitée pour le front-end (sans le port) :"
+read host_du_front_end
+echo "Rentrez le port pour l'url (mettez 80 si le port n'est pas nécessaire). Ne pas utiliser le port 8999 réservé au serveur back-end :"
+read port_prod
+
+
+# en cas de donnée(s) vides
+if [ "$pwd_sql_prod_entry" == "" ]
+    then 
+        pwd_sql_prod_entry="monpwdsql"
+fi
+if [ "$login_prod" == "" ]
+    then 
+        login_prod="monloginspring"
+fi
+if [ "$pwd_prod" == "" ]
+    then 
+        pwd_prod="monpwdspring"
+fi
+if [ "$host_du_front_end" == "" ]
+    then 
+        host_du_front_end="http://localhost"
+fi
+if [ "$port_prod" == "" ]
+    then 
+        port_prod="80"
+fi
+
+
+
 ##############################################################################################
 ##############################################################################################
 ##############################################################################################
@@ -27,14 +59,9 @@ host_du_front_end="http:\/\/localhost"
 # paths---------------------------------------------------
 
 # front
-# NODEMODULES="$PWD/front/node_modules"
-# ANGULAR_BUILT="$PWD/front/dist"
-# NODE_BUILD_DEV="$ANGULAR_BUILT/journal"
-# NODE_BUILD_PROD="$PWD/frontprod/build"
 REQUEST_URL="http:/\/\localhost:8080"
 SERVICE="$PAT/front/src/app/services/service.service.ts"
 SERVICE_SAUV="$PAT/front/src/app/services/service.service.ts$EXTENSION"
-
 
 # back
 PROPERTIES="$PAT/back/src/main/resources/application.properties"
@@ -52,7 +79,7 @@ COMPOSE_SERVEURS_SAUV="$COMPOSE_SERVEURS$EXTENSION"
 COMPOSE_VOLUME="$PAT/database/mysqld"
 JAR_BUILT="$PAT/back/target/journal-prod.jar"
 docker_network="journal"
-database_sauv="$PAT/journalsauv.sql"
+database_sauv="$PAT/database/sql_restaure.sql"
 
 # éléments à remplacer dans les fichiers
 login_dev="superman"
@@ -82,6 +109,21 @@ function ProgressBar {
     _empty=$(printf "%${_left}s")
     printf "\r [${_fill// /#}${_empty// /-}]"
 }
+
+
+# --------------------------- bdd
+echo "voulez-vous repartir avec une base de données vide ? o/n"
+read bddvide
+
+if [ "$bddvide" == "o" ]
+    then 
+        truncate -s 0 "$database_sauv"
+fi
+if [ ! -f "$database_sauv" ]
+    then 
+        touch "$database_sauv"
+fi
+
 
 echo "------------------------------------------------"
 echo "----traitement des fichiers et remplacements----"
@@ -124,20 +166,20 @@ sed -i '11d' "$COMPOSE"
 
 
 # copier le mot de passe sql dans reinit pour pouvoir exporter la bdd et la réinitialiser à l'installation
-sed -i '/passwordinit/d' reinit.sh
-sed -i '/journalsauv/i\docker exec journaldb bash -c "mysqldump -u root -p$passwordinit application journal > journal.sql"' reinit.sh
-sed -i.bak '/modules/i\passwordinit="'$pwd_sql_prod_entry'"' reinit.sh
+sed -i '/docker exec journaldb/d' reinit.sh
+sed -i '/sql_restaure/i\docker exec journaldb bash -c "mysqldump -u root -p'$pwd_sql_prod_entry' --databases application > journal.sql"' reinit.sh
 
 # changer le fichier de configuration sql si il y a une restauration de table journal à effectuer 
 cp "$dockerfile_sql" "$dockerfile_sql_sauv"
 if [ -f "$database_sauv" ]
     then 
-        cp "$PAT"/journalsauv.sql "$PAT"/database/sql_restaure.sql
-        sed -i '/DROP/i\USE application;' "$PAT"/database/sql_restaure.sql
-        sed -i '/USE application/i\CREATE DATABASE IF NOT EXISTS application;' "$PAT"/database/sql_restaure.sql
-        sed -i 's/sql.sql/sql_restaure.sql/' "$PAT/database/Dockerfile"
-    else 
-        echo "pas de fichier de sauvegarde sql, création de la table"
+        test_sql_restaure=$(cat "$PAT"/database/sql_restaure.sql | grep application)
+        if [ ! -s "$PAT"/database/sql_restaure.sql ]
+            then 
+                echo "le fichier de sauvegarse sql ne peut pas être utilisé"
+            else 
+                sed -i 's/sql.sql/sql_restaure.sql/' "$PAT/database/Dockerfile"
+        fi
 fi
 
 
@@ -177,18 +219,37 @@ done
 
 echo " "
 
+# création des fichiers de sauvegarde et de restauration de la bdd pour crontab
+truncate -s 0 sauvegarde_bdd.sh
+printf '#!/bin/bash\n' > sauvegarde_bdd.sh
+echo "docker exec journaldb bash -c \"mysqldump -u root -p"$pwd_sql_prod_entry" --databases application > application.sql\"" >> sauvegarde_bdd.sh
+echo docker cp journaldb:application.sql "$PAT"/db_backup.sql >> sauvegarde_bdd.sh
 
-# echo "Verifier que l'application web fonctionne, aller sur :"
-# echo "$host_prod"
-# echo "souhaitez-vous effacer les fichiers de développement ? o/n"
-# read res
+truncate -s 0 restaure_bdd.sh 
+printf '#!/bin/bash\n' > restaure_bdd.sh
+echo docker cp "$PAT"/db_backup.sql journaldb:application.sql >> restaure_bdd.sh
+echo "docker exec journaldb bash -c \"mysql -u root -p"$pwd_sql_prod_entry" < application.sql\"" >> restaure_bdd.sh
 
-# if [ "$res" == "o" ]
-#     then 
-#         echo "effacement des dossiers inutiles..."
-#         rm -r back 
-#         rm -r front 
-#         rm -r "$COMPOSE_SAUV"
-#         rm -r "$COMPOSE_SERVEURS_SAUV"
-#         echo "done"
-# fi
+
+echo "Verifier que l'application web fonctionne, aller sur :"
+echo "$host_prod"
+echo "souhaitez-vous effacer les fichiers non indispensables pour le build ? o/n"
+read res
+
+if [ "$res" == "o" ]
+    then 
+        echo "effacement des dossiers inutiles..."
+        if [ -d "$PAT"/front/node_modules ]
+            then rm -r "$PAT"/front/node_modules
+        fi
+        if [ -d "$PAT"/frontprod/node_modules ]
+            then rm -r "$PAT"/frontprod/node_modules
+        fi 
+        if [ -d "$PAT"/back/target ]
+            then rm -r "$PAT"/back/target
+        fi
+        echo "done"
+fi
+
+echo "Vous pouvez effectuer des sauvegardes régulières de la base de données par crontab avec le fichier sauvegarde_bdd.sh"
+echo "Vous pouvez alors si besoin effectuer une restauration avec le fichier restaure_bdd.sh"
