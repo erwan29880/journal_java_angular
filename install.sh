@@ -26,7 +26,7 @@ if [ "${arrIN[1]}" == "" ] && [ "${arrIN2[1]}" == "" ]
 fi
 
 # si il n'y a pas la commande docker-compose, remplacement conditionnel de docker-compose par docker compose
-if [ "${arrIN2[1]}" == "" ]
+if [ "${arrIN[1]}" == "" ]
 then
     # parcourir les fichiers dans lesquels il y a le pattern docker-compose
     for output in $fichiers
@@ -56,7 +56,7 @@ then
                 done
     done
 fi
-exit
+
 
 # utilitaires
 EXTENSION="old"

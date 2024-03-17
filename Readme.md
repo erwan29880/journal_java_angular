@@ -1,5 +1,7 @@
 # journal blog privé
 
+L'application web est conçue comme un blog, un journal, sécurisé.
+
 ## technologies  
 
 Pour le build de production il faut docker et docker-compose (ou docker compose) en mode non root (mode root non testé). La commande d'installation est un fichier bash, prévu pour systèmes unix.
@@ -8,7 +10,7 @@ Les fichiers de développements sont en Mysql8 pour la base de données, Java (s
 
 ## Installation  
 
-Cloner le repository, autoriser les fichiers de configuration à l'exécution. Seul le fichier dev.sh installe des éléments (node modules pour développer le front-end en local).   
+Cloner le repository, autoriser les fichiers de configurations à l'exécution. Seul le fichier dev.sh installe des éléments (node modules pour développer le front-end en local, le fichier dev.sh n'est exécuté que par l'utilisateur si besoin).   
 ```bash
 sudo chmod u+x *.sh
 ``` 
@@ -24,7 +26,7 @@ Le programme vous demandera :
 - le mot de passe souhaité pour Mysql  
 - l'identifiant et le mot de passe souhaités pour Spring security    
 - l'adresse souhaitée pour le serveur front-end    
-- le port du serveur front-end (mettre 80 si le port n'est pas nécessaire)  
+- le port du serveur front-end (mettre 80 si le port n'est pas nécessaire, ou laisser vide)  
 
 
 Le programme va effectuer des copies de sauvegarde des fichiers à changer pour le passage en production. Le fichier reinit.sh

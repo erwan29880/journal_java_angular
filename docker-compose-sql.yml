@@ -12,9 +12,7 @@ services:
       - 3306:3306
     networks:
       - journal
-    volumes:
-      - ./mysqld:/var/lib/mysqld
-
+   
 networks:
   journal:
     external: true
