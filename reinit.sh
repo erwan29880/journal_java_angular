@@ -40,13 +40,13 @@ for t in ${arr_sauv[@]}
         fi
 done
 
-docker exec journaldb bash -c "mysqldump -u root -pttt --databases application > journal.sql"
+docker exec journaldb bash -c "mysqldump -u root -pmonpwdsql --databases application > journal.sql"
 rm "$PAT"/database/sql_restaure.sql
 echo "Souhaitez-vous sauvegarder la base de données ? o/n"
 read reponse
 if [ "$reponse" == "o" ]
     then 
-docker exec journaldb bash -c "mysqldump -u root -pttt --databases application > journal.sql"
+docker exec journaldb bash -c "mysqldump -u root -pmonpwdsql --databases application > journal.sql"
     docker cp journaldb:journal.sql "$PAT"/database/sql_restaure.sql
 fi
 

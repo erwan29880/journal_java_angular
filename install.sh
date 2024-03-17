@@ -63,7 +63,7 @@ EXTENSION="old"
 egal="="
 PAT="$PWD"
 COMPOSE_PASSWORD_LINE="MYSQL_ROOT_PASSWORD"
-port_back="8999"
+# port_back="8999"
 
 ##############################################################################################
 ##############################################################################################
@@ -78,6 +78,10 @@ echo "Rentrez l'url souhaitée pour le front-end (sans le port) :"
 read host_du_front_end
 echo "Rentrez le port pour l'url (mettez 80 si le port n'est pas nécessaire). Ne pas utiliser le port 8999 réservé au serveur back-end :"
 read port_prod
+echo "Rentrez l'url souhaitée pour le back-end (sans le port) :"
+read host_du_back_end
+echo "Rentrez le port (mettez 80 si le port n'est pas nécessaire) :"
+read port_back
 
 
 # en cas de donnée(s) vides
@@ -99,7 +103,20 @@ if [ "$host_du_front_end" == "" ]
 fi
 if [ "$port_prod" == "" ]
     then 
-        port_prod="80"
+        port_prod="3000"
+fi
+if [ "$host_du_back_end" == "" ]
+	then 
+		host_du_back_end="http://localhost"
+fi
+if [ "$port_back" == "" ]
+    then 
+        port_back="8999"
+fi
+if [ "$port_prod" == "$port_back" ]
+    then 
+        echo "les port front et back ne peuvent pas être les mêmes !"
+        exit
 fi
 
 
@@ -144,7 +161,7 @@ host_dev="http:\/\/localhost:4200"
 compose_password_line_dev="$COMPOSE_PASSWORD_LINE$pwd_sql_dev"
 compose_password_line_prod="$COMPOSE_PASSWORD_LINE$pwd_sql_prod"
 host_prod="$host_du_front_end:$port_prod"
-host_prod_back="http:\/\/localhost:$port_back"
+host_prod_back="$host_du_back_end:$port_back"
 dockerfile_sql="$PAT/database/Dockerfile"
 dockerfile_sql_sauv="$dockerfile_sql$EXTENSION"
 
@@ -209,6 +226,7 @@ sed -i 's/'$pwd_sql_dev'/'$pwd_sql_prod'/' "$PROPERTIES"
 sed -i 's|'$host_dev'|'$host_prod'|' "$CONTROLLEUR"
 sed -i 's/'$login_dev'/'$login_prod'/' "$UPAF"
 sed -i 's/'$compose_password_line_dev'/'$compose_password_line_prod'/' "$COMPOSE"
+sed -i 's/8999/'$port_back'/' "$COMPOSE_SERVEURS"
 sed -i 's/9000/'$port_prod'/' "$COMPOSE_SERVEURS"
 sed -i 's|'$REQUEST_URL'|'$host_prod_back'|' "$SERVICE"
 
