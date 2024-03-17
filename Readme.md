@@ -2,13 +2,13 @@
 
 ## technologies  
 
-Pour le build de production il faut docker en mode non root (mode root non testé). La commande d'installation est un fichier bash, prévu pour systèmes unix.
+Pour le build de production il faut docker et docker-compose (ou docker compose) en mode non root (mode root non testé). La commande d'installation est un fichier bash, prévu pour systèmes unix.
 
 Les fichiers de développements sont en Mysql8 pour la base de données, Java (spring boot, spring security) pour le serveur back-end, Angular pour le serveur front-end.     
 
 ## Installation  
 
-Cloner le repository, autoriser les fichiers de configuration à l'exécution. Seul le fichier dev.sh installe des éléments (node modules).   
+Cloner le repository, autoriser les fichiers de configuration à l'exécution. Seul le fichier dev.sh installe des éléments (node modules pour développer le front-end en local).   
 ```bash
 sudo chmod u+x *.sh
 ``` 
@@ -17,17 +17,21 @@ Lancer l'installation avec
 ```bash
 ./install.sh
 ```
+
+Si docker-compose n'est pas installé, l'installation ne se fera pas. Sur certaines distributions, la commande docker-compose ne fonctionne pas, et il faut utiliser docker compose. L'installation remplace l'instruction si nécessaire.
+
 Le programme vous demandera :  
 - le mot de passe souhaité pour Mysql  
 - l'identifiant et le mot de passe souhaités pour Spring security    
 - l'adresse souhaitée pour le serveur front-end    
 - le port du serveur front-end (mettre 80 si le port n'est pas nécessaire)  
 
+
 Le programme va effectuer des copies de sauvegarde des fichiers à changer pour le passage en production. Le fichier reinit.sh
 ```bash
 ./reinit.sh
 ``` 
-permet de remplacer les fichiers de production par les fichiers de développement, et de supprimer les containers docker.  La base de données nécessaire au fonctionnement du programme est sauvegardée dans un fichier de sauvegarde sur demande, et sera réinstallée à la prochaine installation.
+permet de remplacer les fichiers de production par ceux de développement, et de supprimer les containers docker. La base de données nécessaire au fonctionnement du programme est sauvegardée dans un fichier de sauvegarde sur demande, et sera réinstallée à la prochaine installation.
 
 ## maintenance  
 

@@ -6,6 +6,58 @@ if [ -f docker-compose-serveurs.ymlold ]
         exit 1
 fi
 
+
+IN="$(whereis -b docker-compose)"
+IN2="$(whereis -b "docker compose")"
+fichiers="$(grep -R -l "docker-compose " ./*)"
+pattern="docker-compose "
+replacement="docker compose "
+
+IFS=':'; arrIN=($IN); unset IFS;
+IFS=':'; arrIN2=($IN2); unset IFS;
+
+
+if [ "${arrIN[1]}" == "" ] && [ "${arrIN2[1]}" == "" ] 
+    then 
+        echo "Vous devez installer docker-compose pour utiliser le programme !"
+        exit
+    else 
+        echo "docker-compose est installé, vérification entre docker-compose ou docker compose"
+fi
+
+# si il n'y a pas la commande docker-compose, remplacement conditionnel de docker-compose par docker compose
+if [ "${arrIN2[1]}" == "" ]
+then
+    # parcourir les fichiers dans lesquels il y a le pattern docker-compose
+    for output in $fichiers
+        do
+            # recherche de la ligne avec docker-compose dans chaque fichier au format n°ligne:la ligne
+            lignes=$(grep -n docker-compose "$output")
+
+            # séparation en lignes
+            echo "$lignes" | while IFS= read -r line; do
+                IFS=':'; arrIN=($line); unset IFS;
+                
+                # affectation du numéro au format string dans prov
+                to_int="${arrIN[0]}"
+                
+                # parseInt
+                numero_ligne=$(echo "$to_int + 0" | bc)
+                
+                # condition de remplacement
+                    if [ "$numero_ligne" -gt 238 ] && [ "$output" == "./install.sh" ]
+                        then
+                            sed -i "${numero_ligne}s/${pattern}/${replacement}/" "$output"
+                    fi
+                    if [ ! "$output" == "./install.sh" ]
+                        then 
+                            sed -i "${numero_ligne}s/${pattern}/${replacement}/" "$output"
+                    fi
+                done
+    done
+fi
+exit
+
 # utilitaires
 EXTENSION="old"
 egal="="
