@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import fr.erwan.journal.journal.database.models.Modele;
 import fr.erwan.journal.journal.database.models.ModeleFront;
+import fr.erwan.journal.journal.database.utils.Escape;
 
 import java.util.*;
 
@@ -29,13 +30,14 @@ public class ServiceImp {
         Pageable paging = PageRequest.of(pageNumber, nbItemsPerPage, Sort.by("id").descending());
         Page<Modele> m = repo.findAll(paging);
         if (!m.isEmpty()) modeles = m.getContent();
+        modeles = Escape.invHtmlEscape(modeles);
         return modeles;
     }
 
     public Modele findOne(Long idi) {
         Long id = idi == null ? 0L : idi;
         Optional<Modele> modele = repo.findById(id);
-        return modele.isPresent() ? modele.get() : new Modele();
+        return modele.isPresent() ? Escape.invHtmlEscape(modele.get()) : new Modele();
     }
 
     public Modele findNext(Long idi) {
@@ -50,7 +52,7 @@ public class ServiceImp {
             }
         } 
         Optional<Modele> modele = repo.findNext(id);
-        return modele.isPresent() ? modele.get() : new Modele();
+        return modele.isPresent() ? Escape.invHtmlEscape(modele.get()) : new Modele();
     }
 
     public Modele findPrevious(Long idi) {
@@ -65,7 +67,7 @@ public class ServiceImp {
             }
         } 
         Optional<Modele> modele = repo.findPrevious(id);
-        return modele.isPresent() ? modele.get() : new Modele();
+        return modele.isPresent() ? Escape.invHtmlEscape(modele.get()) : new Modele();
     }
 
     public long countAll() {
@@ -74,8 +76,9 @@ public class ServiceImp {
 
 
     public boolean save(ModeleFront mf) {
+        
         if (mf.getNote().length() <= 5) return false;
-        Modele modele = new Modele(0L, mf.getNote());
+        Modele modele = new Modele(0L, Escape.htmlEscape(mf.getNote()));
         java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
         modele.setQuand(date);
         if (isValid(modele)) {
